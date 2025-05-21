@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FloatingWhatsAppButton } from "@/components/WhatsAppButton";
 import { useEffect } from "react";
 import CarRental from "@/components/CarRental";
+import { Helmet } from "react-helmet-async";
 
 const DetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,38 +34,59 @@ const DetailPage = () => {
     `Hello, I'm interested in the ${destination.title} (${destination.location}) package for ${destination.price}. Can I get more details?`
   );
 
-  // Add structured data for SEO
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "TouristAttraction",
-      "name": destination.title,
-      "description": destination.description,
-      "image": destination.image,
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": destination.location,
-        "addressCountry": "ID"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": destination.coordinates?.lat || -8.4095,
-        "longitude": destination.coordinates?.lng || 115.1889
-      },
-      "priceRange": destination.price,
-      "publicAccess": true
-    });
-    document.head.appendChild(script);
+  // Generate meta description based on destination
+  const metaDescription = `Explore ${destination.title} in ${destination.location}, Indonesia with Sama Sama Tour. ${destination.description.slice(0, 120)}... Book now from ${destination.price}!`;
+  const metaKeywords = `${destination.location} tour, ${destination.title}, Indonesia travel, ${destination.location} vacation, ${destination.location} holiday, travel agency Indonesia`;
 
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, [destination]);
+  // Add structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "TouristAttraction",
+    "name": destination.title,
+    "description": destination.description,
+    "image": destination.image,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": destination.location,
+      "addressCountry": "ID"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": destination.coordinates?.lat || -8.4095,
+      "longitude": destination.coordinates?.lng || 115.1889
+    },
+    "priceRange": destination.price,
+    "publicAccess": true,
+    "offers": {
+      "@type": "Offer",
+      "price": destination.price.replace(/\D/g, ""),
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    }
+  };
 
   return (
     <div className="min-h-screen bg-brand-light">
+      <Helmet>
+        <title>{`${destination.title} - ${destination.location} | Sama Sama Tour`}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content={metaKeywords} />
+        <link rel="canonical" href={`https://samamatour.com/destination/${id}`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={`${destination.title} - ${destination.location} | Sama Sama Tour`} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content={destination.image} />
+        <meta property="og:url" content={`https://samamatour.com/destination/${id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${destination.title} - ${destination.location} | Sama Sama Tour`} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={destination.image} />
+        <link rel="preload" as="image" href={destination.image} />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
       {/* Navigation */}
       <div className="bg-brand-primary text-white py-4">
         <div className="container mx-auto px-4 md:px-6">
@@ -85,6 +107,9 @@ const DetailPage = () => {
           src={destination.image} 
           alt={destination.title} 
           className="w-full h-full object-cover"
+          loading="eager"
+          width="1200"
+          height="800"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="container mx-auto px-4 md:px-6 pb-8">

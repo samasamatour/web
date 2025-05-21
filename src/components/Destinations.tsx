@@ -75,6 +75,9 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
           src={destination.image} 
           alt={destination.title}
           className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+          loading="lazy"
+          width="400"
+          height="300"
         />
       </div>
       <CardHeader className="pb-2">
