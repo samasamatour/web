@@ -6,22 +6,29 @@ import { useEffect, useState } from "react";
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   
+  // Base Unsplash image URL
+  const imageBaseUrl = "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c";
+  
+  // URL parameters for optimized sizes
+  const largeImageUrl = `${imageBaseUrl}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80`;
+  const mobileImageUrl = `${imageBaseUrl}?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`;
+  
   useEffect(() => {
-    // Let browser know this is an important image to load
+    // Preload image based on screen size
     const img = new Image();
-    img.src = "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80";
+    img.src = window.innerWidth < 768 ? mobileImageUrl : largeImageUrl;
     img.onload = () => setIsLoaded(true);
     
     // If it's already in cache, mark as loaded
     if (img.complete) setIsLoaded(true);
-  }, []);
+  }, [mobileImageUrl, largeImageUrl]);
 
   return (
     <section 
       id="home"
       className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-16 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
       style={{
-        backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1501179691627-eeaa65ea017c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80')",
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${window.innerWidth < 768 ? mobileImageUrl : largeImageUrl}')`,
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
