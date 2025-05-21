@@ -62,7 +62,7 @@ const Index = () => {
       <Footer />
       
       {/* Floating WhatsApp Button */}
-      <FloatingWhatsAppButton phoneNumber="628123456789" />
+      <FloatingWhatsAppButton phoneNumber="6282236037774" />
     </div>
   );
 };

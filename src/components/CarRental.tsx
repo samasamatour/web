@@ -140,7 +140,7 @@ const CarRental = ({ destination }: CarRentalProps) => {
                 {selectedCar === car.id ? 'Selected' : 'Select'}
               </Button>
               <WhatsApp
-                phoneNumber="628123456789"
+                phoneNumber="6282236037774"
                 message={getWhatsAppMessage(car.name, car.price)}
               >
                 Inquire <ArrowRight className="h-4 w-4" />

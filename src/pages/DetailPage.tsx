@@ -153,7 +153,7 @@ const DetailPage = () => {
                 Contact our team to book this amazing tour experience or to get more information about availability and custom requests.
               </p>
               <WhatsApp
-                phoneNumber="628123456789"
+                phoneNumber="6282236037774"
                 message={whatsappMessage}
                 className="w-full mb-4"
               >
@@ -174,7 +174,7 @@ const DetailPage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    <span>+62 812 3456 789</span>
+                    <span>+62 822 3603 7774</span>
                   </li>
                 </ul>
               </div>
@@ -208,7 +208,7 @@ const DetailPage = () => {
       </div>
 
       {/* Floating WhatsApp Button */}
-      <FloatingWhatsAppButton phoneNumber="628123456789" />
+      <FloatingWhatsAppButton phoneNumber="6282236037774" />
     </div>
   );
 };

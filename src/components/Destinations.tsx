@@ -100,7 +100,7 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
           </Button>
         </Link>
         <WhatsApp 
-          phoneNumber="628123456789"
+          phoneNumber="6282236037774"
           message={encodeURIComponent(message)}
           className="ml-2"
         >
