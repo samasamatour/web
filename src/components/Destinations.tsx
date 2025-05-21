@@ -2,6 +2,8 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WhatsApp } from "./WhatsAppButton";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 interface Destination {
   id: string;
@@ -91,13 +93,18 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
       <CardContent className="py-2 flex-grow">
         <p className="text-sm text-left">{destination.description}</p>
       </CardContent>
-      <CardFooter className="pt-2">
+      <CardFooter className="pt-2 flex justify-between">
+        <Link to={`/destination/${destination.id}`} className="flex-grow">
+          <Button variant="outline" className="w-full">
+            View Details <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </Link>
         <WhatsApp 
           phoneNumber="628123456789"
           message={encodeURIComponent(message)}
-          className="w-full"
+          className="ml-2"
         >
-          Get Details
+          Contact
         </WhatsApp>
       </CardFooter>
     </Card>
