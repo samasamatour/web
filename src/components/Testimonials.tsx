@@ -1,30 +1,9 @@
+"use client";
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    location: "Australia",
-    text: "Our Bali tour with Sama Sama was absolutely amazing! The guide was knowledgeable and accommodating. We explored hidden beaches and authentic local restaurants that we would never have found on our own.",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1220&q=80",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "David Chen",
-    location: "Singapore",
-    text: "Raja Ampat was a dream destination for me, and Sama Sama Tour made it perfect. The diving spots were incredible, accommodations were comfortable, and everything was well organized.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1220&q=80",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Emma Wilson",
-    location: "United Kingdom",
-    text: "Our Yogyakarta cultural tour exceeded expectations. Watching the sunrise at Borobudur was magical. Our guide was passionate and informative about the history and culture of each site.",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1220&q=80",
-    rating: 4,
-  },
-];
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Testimonial } from "@/types/database";
+import Image from "next/image";
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
@@ -51,18 +30,22 @@ const StarRating = ({ rating }: { rating: number }) => {
 const TestimonialCard = ({
   testimonial,
 }: {
-  testimonial: typeof testimonials[0];
+  testimonial: Testimonial;
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <StarRating rating={testimonial.rating} />
-      <p className="mt-4 text-gray-600 italic">"{testimonial.text}"</p>
+      <p className="mt-4 text-gray-600 italic">&quot;{testimonial.text}&quot;</p>
       <div className="flex items-center mt-6">
-        <img
-          src={testimonial.avatar}
-          alt={testimonial.name}
-          className="w-12 h-12 rounded-full object-cover mr-4"
-        />
+        <div className="relative w-12 h-12 mr-4">
+          <Image
+            src={testimonial.avatar}
+            alt={testimonial.name}
+            fill
+            className="rounded-full object-cover"
+            sizes="48px"
+          />
+        </div>
         <div className="text-left">
           <h4 className="font-medium">{testimonial.name}</h4>
           <p className="text-sm text-muted-foreground">{testimonial.location}</p>
@@ -73,6 +56,72 @@ const TestimonialCard = ({
 };
 
 const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching testimonials:', error);
+      } else {
+        setTestimonials(data || []);
+      }
+      
+      setLoading(false);
+    }
+
+    fetchTestimonials();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="testimonials" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-dark mb-4">
+              What Our Travelers Say
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto text-muted-foreground">
+              Read genuine reviews from our satisfied clients who have experienced
+              our tours firsthand
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white p-6 rounded-lg shadow-md animate-pulse">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <div key={j} className="w-5 h-5 bg-gray-200 rounded"></div>
+                  ))}
+                </div>
+                <div className="space-y-2 mb-6">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="testimonials" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">

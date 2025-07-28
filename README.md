@@ -1,73 +1,143 @@
-# Welcome to your Lovable project
+# Sama Sama Tour - Next.js with Supabase
 
-## Project info
+A modern travel agency website built with Next.js 15, TypeScript, Tailwind CSS, and Supabase.
 
-**URL**: https://lovable.dev/projects/c182f6c3-2636-4861-9eb1-58c94f182909
+## Features
 
-## How can I edit this code?
+- 🚀 **Next.js 15** with App Router
+- 🎨 **Tailwind CSS** for styling
+- 🗄️ **Supabase** for database and authentication
+- 📱 **Responsive Design** with mobile-first approach
+- 🔍 **SEO Optimized** with proper meta tags and structured data
+- 🖼️ **Image Optimization** with Next.js Image component
+- 📊 **TypeScript** for type safety
+- 🎯 **Component Library** with shadcn/ui
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c182f6c3-2636-4861-9eb1-58c94f182909) and start prompting.
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd sama-sama-tour
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
+```bash
+npm install
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. Set up environment variables:
+```bash
+cp .env.local.example .env.local
+```
 
-Follow these steps:
+4. Update `.env.local` with your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+5. Set up Supabase:
+   - Create a new Supabase project
+   - Run the migration files in `supabase/migrations/` in your Supabase SQL editor
+   - Enable Row Level Security (RLS) for the tables
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+6. Run the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open [http://localhost:3000](http://localhost:3000) to view the website.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Database Schema
 
-**Use GitHub Codespaces**
+### Destinations Table
+- `id` (text, primary key)
+- `title` (text)
+- `location` (text) 
+- `price` (text)
+- `image` (text)
+- `description` (text)
+- `coordinates` (jsonb)
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Testimonials Table
+- `id` (uuid, primary key)
+- `name` (text)
+- `location` (text)
+- `text` (text)
+- `avatar` (text)
+- `rating` (integer)
+- `created_at` (timestamp)
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── destination/        # Dynamic destination pages
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Home page
+│   └── not-found.tsx       # 404 page
+├── components/             # React components
+│   ├── ui/                 # shadcn/ui components
+│   ├── About.tsx
+│   ├── CarRental.tsx
+│   ├── Contact.tsx
+│   ├── Destinations.tsx
+│   ├── Footer.tsx
+│   ├── Hero.tsx
+│   ├── Navbar.tsx
+│   ├── Testimonials.tsx
+│   └── WhatsAppButton.tsx
+├── lib/                    # Utility functions
+│   ├── supabase/           # Supabase client configuration
+│   └── utils.ts
+└── types/                  # TypeScript type definitions
+    └── database.ts
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Deployment
 
-## How can I deploy this project?
+### Vercel (Recommended)
 
-Simply open [Lovable](https://lovable.dev/projects/c182f6c3-2636-4861-9eb1-58c94f182909) and click on Share -> Publish.
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
 
-## Can I connect a custom domain to my Lovable project?
+### Other Platforms
 
-Yes, you can!
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- Railway
+- DigitalOcean App Platform
+- AWS Amplify
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Environment Variables
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

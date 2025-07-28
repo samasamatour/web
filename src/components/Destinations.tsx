@@ -1,83 +1,27 @@
+"use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WhatsApp } from "./WhatsAppButton";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-
-interface Destination {
-  id: string;
-  title: string;
-  location: string;
-  price: string;
-  image: string;
-  description: string;
-}
-
-const destinations: Destination[] = [
-  {
-    id: "bali",
-    title: "Bali Paradise Tour",
-    location: "Bali",
-    price: "Rp 5.500.000",
-    image: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "Explore the magical island of Bali, visit sacred temples, beautiful beaches, and experience the unique culture. 5 days 4 nights package includes accommodation and transport."
-  },
-  {
-    id: "lombok",
-    title: "Lombok Adventure",
-    location: "Lombok",
-    price: "Rp 4.800.000",
-    image: "https://images.unsplash.com/photo-1626331900236-8a1207c78e33?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "Discover the pristine beaches of Lombok and the famous Gili Islands. 4 days 3 nights package with snorkeling experience and beach activities."
-  },
-  {
-    id: "yogyakarta",
-    title: "Historical Yogyakarta",
-    location: "Yogyakarta",
-    price: "Rp 3.200.000",
-    image: "https://images.unsplash.com/photo-1584810359583-96fc3448beaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "Visit the ancient temples of Borobudur and Prambanan, explore the culture of Yogyakarta. 3 days 2 nights with guided tours and cultural experiences."
-  },
-  {
-    id: "komodo",
-    title: "Komodo Dragon Expedition",
-    location: "Flores",
-    price: "Rp 6.900.000",
-    image: "https://images.unsplash.com/photo-1577401239170-897942555fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "See the legendary Komodo dragons in their natural habitat, explore Pink Beach, and enjoy snorkeling in crystal clear waters. 5 days 4 nights full expedition."
-  },
-  {
-    id: "raja-ampat",
-    title: "Raja Ampat Diving",
-    location: "Papua",
-    price: "Rp 12.500.000",
-    image: "https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "Explore one of the most biodiverse marine locations in the world. 7 days 6 nights package with diving sessions, island hopping, and local experiences."
-  },
-  {
-    id: "toraja",
-    title: "Cultural Toraja",
-    location: "Sulawesi",
-    price: "Rp 4.500.000",
-    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1080&q=80",
-    description: "Experience the unique culture of Toraja, see traditional burial sites, ancient villages and beautiful landscapes. 4 days 3 nights cultural immersion."
-  },
-];
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Destination } from "@/types/database";
 
 const DestinationCard = ({ destination }: { destination: Destination }) => {
   const message = `Hello, I'm interested in the ${destination.title} (${destination.location}) package for ${destination.price}. Can I get more information?`;
   
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg h-full flex flex-col">
-      <div className="aspect-[4/3] overflow-hidden">
-        <img 
+      <div className="aspect-[4/3] overflow-hidden relative">
+        <Image 
           src={destination.image} 
           alt={destination.title}
-          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-          loading="lazy"
-          width="400"
-          height="300"
+          fill
+          className="object-cover transition-transform duration-700 hover:scale-110"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
       <CardHeader className="pb-2">
@@ -94,10 +38,10 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
         </span>
       </CardHeader>
       <CardContent className="py-2 flex-grow">
-        <p className="text-sm text-left">{destination.description}</p>
+        <p className="text-sm text-left">{destination.description.slice(0, 150)}...</p>
       </CardContent>
       <CardFooter className="pt-2 flex justify-between">
-        <Link to={`/destination/${destination.id}`} className="flex-grow">
+        <Link href={`/destination/${destination.id}`} className="flex-grow">
           <Button variant="outline" className="w-full">
             View Details <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
@@ -115,6 +59,63 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
 };
 
 const Destinations = () => {
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDestinations() {
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('destinations')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching destinations:', error);
+      } else {
+        setDestinations(data || []);
+      }
+      
+      setLoading(false);
+    }
+
+    fetchDestinations();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="destinations" className="py-20 bg-brand-light">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Popular Destinations</h2>
+            <p className="text-lg max-w-2xl mx-auto text-muted-foreground">
+              Explore our handpicked selection of the most beautiful destinations in Indonesia
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow-sm animate-pulse">
+                <div className="aspect-[4/3] bg-gray-200 rounded-t-lg"></div>
+                <div className="p-6">
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4 w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
+                  <div className="flex gap-2">
+                    <div className="h-10 bg-gray-200 rounded flex-grow"></div>
+                    <div className="h-10 bg-gray-200 rounded w-20"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="destinations" className="py-20 bg-brand-light">
       <div className="container mx-auto px-4 md:px-6">

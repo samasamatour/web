@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { WhatsApp } from "./WhatsAppButton";
 import { ArrowRight, CarFront } from "lucide-react";
+import { Destination } from "@/types/database";
+import Image from "next/image";
 
 // Car rental options
 const carOptions = [
@@ -50,10 +51,7 @@ const carOptions = [
 ];
 
 interface CarRentalProps {
-  destination: {
-    title: string;
-    location: string;
-  };
+  destination: Destination;
 }
 
 const CarRental = ({ destination }: CarRentalProps) => {
@@ -92,11 +90,13 @@ const CarRental = ({ destination }: CarRentalProps) => {
             key={car.id} 
             className={`overflow-hidden transition-all duration-300 hover:shadow-md ${selectedCar === car.id ? 'ring-2 ring-brand-primary' : ''}`}
           >
-            <div className="aspect-video overflow-hidden">
-              <img 
+            <div className="aspect-video overflow-hidden relative">
+              <Image 
                 src={car.image} 
                 alt={car.name}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
             <CardContent className="p-4">
