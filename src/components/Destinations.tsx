@@ -1,13 +1,9 @@
-"use client";
-
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WhatsApp } from "./WhatsAppButton";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Destination } from "@/types/database";
 
 const DestinationCard = ({ destination }: { destination: Destination }) => {
@@ -58,64 +54,11 @@ const DestinationCard = ({ destination }: { destination: Destination }) => {
   );
 };
 
-const Destinations = () => {
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [loading, setLoading] = useState(true);
+interface DestinationsProps {
+  destinations: Destination[];
+}
 
-  useEffect(() => {
-    async function fetchDestinations() {
-      const supabase = createClient();
-      
-      const { data, error } = await supabase
-        .from('destinations')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching destinations:', error);
-      } else {
-        setDestinations(data || []);
-      }
-      
-      setLoading(false);
-    }
-
-    fetchDestinations();
-  }, []);
-
-  if (loading) {
-    return (
-      <section id="destinations" className="py-20 bg-brand-light">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-brand-dark mb-4">Popular Destinations</h2>
-            <p className="text-lg max-w-2xl mx-auto text-muted-foreground">
-              Explore our handpicked selection of the most beautiful destinations in Indonesia
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm animate-pulse">
-                <div className="aspect-[4/3] bg-gray-200 rounded-t-lg"></div>
-                <div className="p-6">
-                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4 w-1/2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
-                  <div className="flex gap-2">
-                    <div className="h-10 bg-gray-200 rounded flex-grow"></div>
-                    <div className="h-10 bg-gray-200 rounded w-20"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+const Destinations = ({ destinations }: DestinationsProps) => {
   return (
     <section id="destinations" className="py-20 bg-brand-light">
       <div className="container mx-auto px-4 md:px-6">

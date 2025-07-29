@@ -6,8 +6,47 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { FloatingWhatsAppButton } from "@/components/WhatsAppButton";
+import { createClient } from "@/lib/supabase/server";
+import { Destination, Testimonial } from "@/types/database";
 
-export default function Home() {
+async function getDestinations(): Promise<Destination[]> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('destinations')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching destinations:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+async function getTestimonials(): Promise<Testimonial[]> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('testimonials')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching testimonials:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export default async function Home() {
+  const [destinations, testimonials] = await Promise.all([
+    getDestinations(),
+    getTestimonials()
+  ]);
+
   return (
     <div className="min-h-screen">
       {/* Navbar */}
@@ -17,13 +56,13 @@ export default function Home() {
       <Hero />
       
       {/* Destinations */}
-      <Destinations />
+      <Destinations destinations={destinations} />
       
       {/* About Us */}
       <About />
       
       {/* Testimonials */}
-      <Testimonials />
+      <Testimonials testimonials={testimonials} />
       
       {/* Contact */}
       <Contact />
