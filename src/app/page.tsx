@@ -52,7 +52,7 @@ export default async function Home() {
       {/* Navbar */}
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Hero */}
       <Hero />
       
       {/* Destinations */}
@@ -62,13 +62,13 @@ export default async function Home() {
       <About />
       
       {/* Testimonials */}
-      <Testimonials testimonials={testimonials} />
+      {/* <Testimonials testimonials={testimonials} /> */}
       
       {/* Contact */}
       <Contact />
       
       {/* Footer */}
-      <Footer />
+      <Footer /> 
       
       {/* Floating WhatsApp Button */}
       <FloatingWhatsAppButton phoneNumber="6282236037774" />

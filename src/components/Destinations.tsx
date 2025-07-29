@@ -1,3 +1,5 @@
+
+`use client`;
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WhatsApp } from "./WhatsAppButton";
@@ -5,6 +7,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Destination } from "@/types/database";
+
+
+
 
 const DestinationCard = ({ destination }: { destination: Destination }) => {
   const message = `Hello, I'm interested in the ${destination.title} (${destination.location}) package for ${destination.price}. Can I get more information?`;

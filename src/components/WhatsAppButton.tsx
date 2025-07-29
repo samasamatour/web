@@ -1,4 +1,4 @@
-
+'use client';
 import { Button, ButtonProps } from "@/components/ui/button";
 import { WhatsappIcon } from "./Icons";
 import { cn } from "@/lib/utils";
