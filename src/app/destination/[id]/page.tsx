@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { WhatsApp } from "@/components/WhatsAppButton";
