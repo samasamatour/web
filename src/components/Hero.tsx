@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentBackgroundImageUrl, setCurrentBackgroundImageUrl] = useState('');
   
   // Base Unsplash image URL
   const imageBaseUrl = "https://images.unsplash.com/photo-1501179691627-eeaa65ea017c";
@@ -15,9 +16,13 @@ const Hero = () => {
   const mobileImageUrl = `${imageBaseUrl}?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80`;
   
   useEffect(() => {
+    // Determine the appropriate image URL based on screen size
+    const imageUrl = window.innerWidth < 768 ? mobileImageUrl : largeImageUrl;
+    setCurrentBackgroundImageUrl(imageUrl);
+    
     // Preload image based on screen size
     const img = new Image();
-    img.src = window.innerWidth < 768 ? mobileImageUrl : largeImageUrl;
+    img.src = imageUrl;
     img.onload = () => setIsLoaded(true);
     
     // If it's already in cache, mark as loaded
@@ -29,7 +34,7 @@ const Hero = () => {
       id="home"
       className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-16 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
       style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${window.innerWidth < 768 ? mobileImageUrl : largeImageUrl}')`,
+        backgroundImage: currentBackgroundImageUrl ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${currentBackgroundImageUrl}')` : 'none',
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
