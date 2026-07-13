@@ -1,22 +1,16 @@
-
 {
-  "name": "Sama Sama Tour - Explore Indonesia",
+  "name": "Sama Sama Tour - Corporate Outing",
   "short_name": "Sama Sama Tour",
-  "description": "Discover the beauty of Indonesia with Sama Sama Tour",
+  "description": "Corporate outing and team building packages in Indonesia",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1D9A8B",
+  "theme_color": "#2A9D8F",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
     }
   ]
 }
