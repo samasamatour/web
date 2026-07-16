@@ -50,6 +50,7 @@ export type PackageListItem = {
   priceIdr: number;
   featured: boolean;
   heroImageUrl: string | null;
+  imageCacheKey: string;
   heroImageAlt: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
@@ -90,6 +91,7 @@ export type PackageDetail = PackageListItem & {
     hasAc: boolean;
     luggageCapacity: number | null;
     imageUrl: string | null;
+    imageCacheKey: string;
   }[];
 };
 
@@ -331,7 +333,7 @@ export async function getPublishedPackages(locale: Locale): Promise<PackageListI
   const { data: packages } = await supabase
     .from('packages')
     .select(
-      'id, code, duration_days, duration_nights, min_pax, max_pax, price_idr, featured, sort_order, hero_media_id'
+      'id, code, duration_days, duration_nights, min_pax, max_pax, price_idr, featured, sort_order, hero_media_id, updated_at'
     )
     .eq('status', 'published')
     .order('sort_order', { ascending: true })
@@ -370,6 +372,7 @@ export async function getPublishedPackages(locale: Locale): Promise<PackageListI
         priceIdr: Number(pkg.price_idr),
         featured: pkg.featured,
         heroImageUrl: media?.source_url || null,
+        imageCacheKey: `${pkg.id}:${pkg.updated_at || ''}`,
         heroImageAlt: pkg.hero_media_id ? mediaAltMap.get(pkg.hero_media_id) || null : null,
         seoTitle: i18n.seo_title,
         seoDescription: i18n.seo_description,
@@ -408,7 +411,7 @@ async function getPackageBySlug(locale: Locale, slug: string): Promise<any | nul
   const { data: pkg } = await supabase
     .from('packages')
     .select(
-      'id, code, duration_days, duration_nights, min_pax, max_pax, price_idr, featured, hero_media_id, status'
+      'id, code, duration_days, duration_nights, min_pax, max_pax, price_idr, featured, hero_media_id, status, updated_at'
     )
     .eq('id', packageId)
     .eq('status', 'published')
@@ -516,7 +519,7 @@ export async function getPackageDetail(
     ? await supabase
         .from('car_rentals')
         .select(
-          'id, price_idr, seats, transmission, has_ac, luggage_capacity, image_media_id, status'
+          'id, price_idr, seats, transmission, has_ac, luggage_capacity, image_media_id, status, updated_at'
         )
         .in('id', carIds)
         .eq('status', 'published')
@@ -588,6 +591,7 @@ export async function getPackageDetail(
         hasAc: car.has_ac,
         luggageCapacity: car.luggage_capacity,
         imageUrl: car.image_media_id ? carMediaMap.get(car.image_media_id)?.source_url || null : null,
+        imageCacheKey: `${car.id}:${car.updated_at || ''}`,
       };
     })
     .filter((item): item is PackageDetail['carRentals'][number] => item !== null);
@@ -605,6 +609,7 @@ export async function getPackageDetail(
     priceIdr: Number(pkg.price_idr),
     featured: pkg.featured,
     heroImageUrl: pkg.hero_media_id ? mediaMap.get(pkg.hero_media_id)?.source_url || null : null,
+    imageCacheKey: `${pkg.id}:${pkg.updated_at || ''}`,
     heroImageAlt: pkg.hero_media_id ? mediaAltMap.get(pkg.hero_media_id) || null : null,
     seoTitle: i18n.seo_title,
     seoDescription: i18n.seo_description,

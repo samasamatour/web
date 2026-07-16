@@ -2,7 +2,13 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getPageByKey, getPublishedPackages, getSiteSettings, getBlogPosts } from '@/lib/cms/queries';
+import {
+  getPageByKey,
+  getPublishedPackages,
+  getSiteSettings,
+  getBlogPosts,
+  type PackageListItem,
+} from '@/lib/cms/queries';
 import { Locale, isLocale, t } from '@/lib/i18n';
 import { metadataAlternates } from '@/lib/site';
 import { SectionRenderer } from '@/components/site/SectionRenderer';
@@ -58,33 +64,13 @@ export async function generateMetadata({
   };
 }
 
-// ─── Destination data ──────────────────────────────────────────────────────
-const destinations = [
-  {
-    name: 'Bromo Sunrise',
-    tag: 'East Java',
-    image: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80',
-    slug: 'surabaya-bromo-songa-50-pax',
-  },
-  {
-    name: 'Borobudur',
-    tag: 'Central Java',
-    image: 'https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?auto=format&fit=crop&w=800&q=80',
-    slug: 'jakarta-borobudur-50-pax',
-  },
-  {
-    name: 'Karimunjawa',
-    tag: 'Java Sea',
-    image: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=800&q=80',
-    slug: 'jakarta-karimunjawa-50-pax',
-  },
-  {
-    name: 'Cileunca Lake',
-    tag: 'West Java',
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
-    slug: 'jakarta-bandung-pangalengan-50-pax',
-  },
-];
+function inferLocationFromSlug(slug: string): string {
+  if (slug.includes('bromo')) return 'East Java';
+  if (slug.includes('borobudur')) return 'Central Java';
+  if (slug.includes('karimunjawa')) return 'Java Sea';
+  if (slug.includes('pangalengan') || slug.includes('bandung')) return 'West Java';
+  return 'Indonesia';
+}
 
 // ─── Stats ─────────────────────────────────────────────────────────────────
 function StatsBar({ locale }: { locale: Locale }) {
@@ -113,7 +99,28 @@ function StatsBar({ locale }: { locale: Locale }) {
 }
 
 // ─── Destinations grid ─────────────────────────────────────────────────────
-function DestinationsSection({ locale }: { locale: Locale }) {
+function DestinationsSection({
+  locale,
+  packages,
+}: {
+  locale: Locale;
+  packages: PackageListItem[];
+}) {
+  const destinations = packages
+    .filter((pkg) => pkg.heroImageUrl)
+    .slice(0, 4)
+    .map((pkg) => ({
+      name: pkg.name,
+      tag: inferLocationFromSlug(pkg.slug),
+      image: pkg.heroImageUrl,
+      cacheKey: pkg.imageCacheKey,
+      slug: pkg.slug,
+    }));
+
+  if (!destinations.length) {
+    return null;
+  }
+
   return (
     <section className="space-y-8">
       <div className="flex items-end justify-between">
@@ -143,7 +150,8 @@ function DestinationsSection({ locale }: { locale: Locale }) {
           >
             <div className="relative h-64 w-full overflow-hidden">
               <Image
-                src={dest.image}
+                key={`${dest.slug}:${dest.cacheKey}`}
+                src={toImageProxyUrl(dest.image, dest.cacheKey)}
                 alt={dest.name}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -233,7 +241,7 @@ export default async function LocaleHomePage({
   const heroSlides: HeroSlide[] = packages
     .filter((pkg) => pkg.heroImageUrl)
     .map((pkg) => ({
-      imageUrl: toImageProxyUrl(pkg.heroImageUrl),
+      imageUrl: toImageProxyUrl(pkg.heroImageUrl, pkg.imageCacheKey),
       packageName: pkg.name || destinationLabels[pkg.code]?.name || pkg.code,
       location:
         destinationLabels[pkg.code]?.location ||
@@ -368,7 +376,7 @@ export default async function LocaleHomePage({
       {trustSection && <SectionRenderer section={trustSection} locale={locale} />}
 
       {/* ⑤ DESTINATIONS */}
-      <DestinationsSection locale={locale} />
+      <DestinationsSection locale={locale} packages={displayPackages.length ? displayPackages : packages} />
 
       {/* ⑥ ABOUT */}
       {aboutSection && (

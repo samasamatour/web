@@ -16,6 +16,8 @@ function parseJsonArray(value: string): any[] {
 }
 
 function revalidatePackagePublicPaths(slugId?: string, slugEn?: string) {
+  revalidatePath('/id');
+  revalidatePath('/en');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
   revalidatePath('/id/packages/[slug]', 'page');

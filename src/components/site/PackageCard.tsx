@@ -26,7 +26,8 @@ export function PackageCard({
       {/* Image */}
       <div className="relative h-60 w-full overflow-hidden">
         <Image
-          src={toImageProxyUrl(packageItem.heroImageUrl)}
+          key={`${packageItem.id}:${packageItem.imageCacheKey}`}
+          src={toImageProxyUrl(packageItem.heroImageUrl, packageItem.imageCacheKey)}
           alt={packageItem.heroImageAlt || packageItem.name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"

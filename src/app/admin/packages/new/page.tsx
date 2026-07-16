@@ -53,6 +53,8 @@ async function createPackageAction(formData: FormData) {
   const slugId = String(formData.get('slug_id') || '').trim();
   const slugEn = String(formData.get('slug_en') || '').trim();
 
+  revalidatePath('/id');
+  revalidatePath('/en');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
   revalidatePath('/id/packages/[slug]', 'page');

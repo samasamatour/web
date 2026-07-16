@@ -18,7 +18,7 @@ export function BlogCard({ locale, post }: { locale: Locale; post: BlogListItem 
       {/* Cover image */}
       <div className="relative h-48 w-full overflow-hidden">
         <Image
-          src={toImageProxyUrl(post.coverImageUrl)}
+          src={toImageProxyUrl(post.coverImageUrl, post.id)}
           alt={post.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"

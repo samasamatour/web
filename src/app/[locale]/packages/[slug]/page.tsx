@@ -35,6 +35,10 @@ export async function generateMetadata({
     packageDetail.seoDescription ||
     packageDetail.summary ||
     'Corporate outing package by Sama Sama Tour.';
+  const heroImage = toImageProxyUrl(
+    packageDetail.heroImageUrl,
+    packageDetail.imageCacheKey
+  );
 
   return {
     title,
@@ -44,14 +48,14 @@ export async function generateMetadata({
       type: 'article',
       title,
       description,
-      images: packageDetail.heroImageUrl ? [toImageProxyUrl(packageDetail.heroImageUrl)] : undefined,
+      images: packageDetail.heroImageUrl ? [heroImage] : undefined,
       locale: locale === 'id' ? 'id_ID' : 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: packageDetail.heroImageUrl ? [toImageProxyUrl(packageDetail.heroImageUrl)] : undefined,
+      images: packageDetail.heroImageUrl ? [heroImage] : undefined,
     },
   };
 }
@@ -83,12 +87,17 @@ export default async function PackageDetailPage({
       : `Hello Sama Sama Tour, I am interested in the ${packageDetail.name} package. Please share full details and final quotation.`
   );
 
+  const heroImage = toImageProxyUrl(
+    packageDetail.heroImageUrl,
+    packageDetail.imageCacheKey
+  );
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: packageDetail.name,
     description: packageDetail.summary || packageDetail.overview || packageDetail.name,
-    image: packageDetail.heroImageUrl ? [toImageProxyUrl(packageDetail.heroImageUrl)] : undefined,
+    image: packageDetail.heroImageUrl ? [heroImage] : undefined,
     offers: {
       '@type': 'Offer',
       priceCurrency: 'IDR',
@@ -118,7 +127,8 @@ export default async function PackageDetailPage({
 
         <div className="relative h-[280px] w-full overflow-hidden rounded-2xl md:h-[420px]">
           <Image
-            src={toImageProxyUrl(packageDetail.heroImageUrl)}
+            key={heroImage}
+            src={heroImage}
             alt={packageDetail.heroImageAlt || packageDetail.name}
             fill
             className="object-cover"
@@ -244,7 +254,8 @@ export default async function PackageDetailPage({
             <div key={car.id} className="rounded-lg border p-4">
               <div className="relative h-36 w-full overflow-hidden rounded-md">
                 <Image
-                  src={toImageProxyUrl(car.imageUrl)}
+                  key={`${car.id}:${car.imageCacheKey}`}
+                  src={toImageProxyUrl(car.imageUrl, car.imageCacheKey)}
                   alt={car.name}
                   fill
                   className="object-cover"
