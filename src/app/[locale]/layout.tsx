@@ -50,7 +50,8 @@ export default async function LocaleLayout({
       />
       <SiteHeader locale={locale} items={headerMenu} />
       <main className="container mx-auto px-4 py-8 md:px-6">{children}</main>
-      <SiteFooter locale={locale} items={footerMenu} />
+      <SiteFooter locale={locale} items={footerMenu} settings={settings} />
     </>
   );
 }
+

@@ -29,6 +29,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-icon.jpg',
+  },
   openGraph: {
     type: 'website',
     title: 'Sama Sama Tour',
@@ -36,12 +41,21 @@ export const metadata: Metadata = {
       'Corporate outing and team-building programs across Indonesia for local and global markets.',
     url: SITE_URL,
     siteName: 'Sama Sama Tour',
+    images: [
+      {
+        url: '/logo.jpeg',
+        width: 1000,
+        height: 1000,
+        alt: 'Sama Sama Tour & Exploration',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sama Sama Tour',
     description:
       'Corporate outing and team-building programs across Indonesia for local and global markets.',
+    images: ['/logo.jpeg'],
   },
   robots: {
     index: true,

@@ -4,65 +4,65 @@
 
 @layer base {
   :root {
-    --background: 170 33% 98%;
-    --foreground: 200 33% 18%;
+    --background: 270 20% 98%;
+    --foreground: 270 40% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 200 33% 18%;
+    --card-foreground: 270 40% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 200 33% 18%;
+    --popover-foreground: 270 40% 12%;
 
-    --primary: 174 59% 39%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 49 100% 48%;  /* Logo gold */
+    --primary-foreground: 270 40% 12%;
 
-    --secondary: 42 78% 60%;
-    --secondary-foreground: 200 33% 18%;
+    --secondary: 270 40% 20%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 174 20% 92%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 270 15% 94%;
+    --muted-foreground: 270 15% 50%;
 
-    --accent: 27 87% 67%;
-    --accent-foreground: 200 33% 18%;
+    --accent: 49 100% 93%;
+    --accent-foreground: 270 40% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 174 59% 39%;
+    --border: 270 15% 88%;
+    --input: 270 15% 88%;
+    --ring: 49 100% 48%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 200 33% 10%;
+    --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 200 33% 12%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 200 33% 12%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 174 59% 39%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 24.6 95% 53.1%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 42 78% 60%;
-    --secondary-foreground: 200 33% 18%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 200 33% 20%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 27 87% 67%;
-    --accent-foreground: 200 33% 18%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 33% 20%;
-    --input: 200 33% 20%;
-    --ring: 174 59% 39%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 24.6 95% 53.1%;
   }
 }
 
@@ -83,6 +83,67 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+
+  /* Glassmorphism helpers */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient text — gold */
+  .text-gradient {
+    background: linear-gradient(135deg, #F5C200, #E8A800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+
+  /* Shine effect on hover */
+  .shine-hover {
+    position: relative;
+    overflow: hidden;
+  }
+  .shine-hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.15) 50%,
+      rgba(255,255,255,0) 100%
+    );
+    transform: skewX(-25deg);
+    transition: left 0.6s ease;
+  }
+  .shine-hover:hover::after {
+    left: 125%;
   }
 }
 
