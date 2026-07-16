@@ -6,7 +6,7 @@ import { getPackageDetail, getSiteSettings } from '@/lib/cms/queries';
 import { Locale, isLocale, t } from '@/lib/i18n';
 import { metadataAlternates } from '@/lib/site';
 import { estimateUSD, formatIDR } from '@/lib/currency';
-import { toImageProxyUrl } from '@/lib/media';
+import { isProxyImageUrl, toImageProxyUrl } from '@/lib/media';
 
 export const revalidate = 300;
 
@@ -131,6 +131,7 @@ export default async function PackageDetailPage({
             src={heroImage}
             alt={packageDetail.heroImageAlt || packageDetail.name}
             fill
+            unoptimized={isProxyImageUrl(heroImage)}
             className="object-cover"
             sizes="100vw"
           />
@@ -258,6 +259,7 @@ export default async function PackageDetailPage({
                   src={toImageProxyUrl(car.imageUrl, car.imageCacheKey)}
                   alt={car.name}
                   fill
+                  unoptimized={isProxyImageUrl(toImageProxyUrl(car.imageUrl, car.imageCacheKey))}
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />

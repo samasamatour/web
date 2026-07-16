@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { isProxyImageUrl } from '@/lib/media';
 
 export type HeroSlide = {
   imageUrl: string;
@@ -71,6 +72,7 @@ export function HeroCarousel({
             alt={slide.packageName}
             fill
             priority={i === 0}
+            unoptimized={isProxyImageUrl(slide.imageUrl)}
             className="object-cover"
             sizes="100vw"
           />

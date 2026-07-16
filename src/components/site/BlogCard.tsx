@@ -2,9 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BlogListItem } from '@/lib/cms/queries';
 import { Locale, t } from '@/lib/i18n';
-import { toImageProxyUrl } from '@/lib/media';
+import { isProxyImageUrl, toImageProxyUrl } from '@/lib/media';
 
 export function BlogCard({ locale, post }: { locale: Locale; post: BlogListItem }) {
+  const coverSrc = toImageProxyUrl(post.coverImageUrl, post.id);
   const dateLabel = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
         year: 'numeric',
@@ -18,9 +19,10 @@ export function BlogCard({ locale, post }: { locale: Locale; post: BlogListItem 
       {/* Cover image */}
       <div className="relative h-48 w-full overflow-hidden">
         <Image
-          src={toImageProxyUrl(post.coverImageUrl, post.id)}
+          src={coverSrc}
           alt={post.title}
           fill
+          unoptimized={isProxyImageUrl(coverSrc)}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 33vw"
         />

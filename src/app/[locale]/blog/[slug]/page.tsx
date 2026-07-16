@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getBlogPostBySlug } from '@/lib/cms/queries';
 import { Locale, isLocale, t } from '@/lib/i18n';
 import { metadataAlternates } from '@/lib/site';
-import { toImageProxyUrl } from '@/lib/media';
+import { isProxyImageUrl, toImageProxyUrl } from '@/lib/media';
 
 export const revalidate = 300;
 
@@ -31,6 +31,7 @@ export async function generateMetadata({
 
   const title = post.seoTitle || post.title;
   const description = post.seoDescription || post.excerpt || post.title;
+  const coverImage = toImageProxyUrl(post.coverImageUrl, post.id);
 
   return {
     title,
@@ -41,13 +42,13 @@ export async function generateMetadata({
       type: 'article',
       title,
       description,
-      images: post.coverImageUrl ? [toImageProxyUrl(post.coverImageUrl)] : undefined,
+      images: post.coverImageUrl ? [coverImage] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: post.coverImageUrl ? [toImageProxyUrl(post.coverImageUrl)] : undefined,
+      images: post.coverImageUrl ? [coverImage] : undefined,
     },
   };
 }
@@ -77,12 +78,14 @@ export default async function BlogDetailPage({
       })
     : '-';
 
+  const coverImage = toImageProxyUrl(post.coverImageUrl, post.id);
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     datePublished: post.publishedAt,
-    image: post.coverImageUrl ? [toImageProxyUrl(post.coverImageUrl)] : undefined,
+    image: post.coverImageUrl ? [coverImage] : undefined,
     author: {
       '@type': 'Organization',
       name: 'Sama Sama Tour',
@@ -114,9 +117,10 @@ export default async function BlogDetailPage({
 
       <div className="relative h-[300px] w-full overflow-hidden rounded-2xl md:h-[420px]">
         <Image
-          src={toImageProxyUrl(post.coverImageUrl)}
+          src={coverImage}
           alt={post.title}
           fill
+          unoptimized={isProxyImageUrl(coverImage)}
           className="object-cover"
           sizes="100vw"
         />

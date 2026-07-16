@@ -69,3 +69,11 @@ export function toImageProxyUrl(
   const ckSuffix = cacheKey ? `&ck=${encodeURIComponent(cacheKey)}` : '';
   return `/api/image-proxy?url=${encoded}${ckSuffix}`;
 }
+
+export function isProxyImageUrl(url: string | null | undefined): boolean {
+  if (!url) {
+    return false;
+  }
+
+  return url.startsWith('/api/image-proxy?');
+}

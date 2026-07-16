@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PackageListItem } from '@/lib/cms/queries';
 import { Locale, t } from '@/lib/i18n';
-import { toImageProxyUrl } from '@/lib/media';
+import { isProxyImageUrl, toImageProxyUrl } from '@/lib/media';
 import { estimateUSD, formatIDR } from '@/lib/currency';
 
 export function PackageCard({
@@ -20,6 +20,7 @@ export function PackageCard({
       `Hello, I'm interested in the ${packageItem.name} package. Could I get more info?`
     )
   );
+  const heroSrc = toImageProxyUrl(packageItem.heroImageUrl, packageItem.imageCacheKey);
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-transparent">
@@ -27,9 +28,10 @@ export function PackageCard({
       <div className="relative h-60 w-full overflow-hidden">
         <Image
           key={`${packageItem.id}:${packageItem.imageCacheKey}`}
-          src={toImageProxyUrl(packageItem.heroImageUrl, packageItem.imageCacheKey)}
+          src={heroSrc}
           alt={packageItem.heroImageAlt || packageItem.name}
           fill
+          unoptimized={isProxyImageUrl(heroSrc)}
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, 33vw"
         />

@@ -15,7 +15,7 @@ import { SectionRenderer } from '@/components/site/SectionRenderer';
 import { PackageCard } from '@/components/site/PackageCard';
 import { BlogCard } from '@/components/site/BlogCard';
 import { HeroCarousel, HeroSlide } from '@/components/site/HeroCarousel';
-import { toImageProxyUrl } from '@/lib/media';
+import { isProxyImageUrl, toImageProxyUrl } from '@/lib/media';
 
 export const revalidate = 300;
 
@@ -142,7 +142,10 @@ function DestinationsSection({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {destinations.map((dest) => (
+        {destinations.map((dest) => {
+          const destinationSrc = toImageProxyUrl(dest.image, dest.cacheKey);
+
+          return (
           <Link
             key={dest.slug}
             href={`/${locale}/packages/${dest.slug}`}
@@ -151,9 +154,10 @@ function DestinationsSection({
             <div className="relative h-64 w-full overflow-hidden">
               <Image
                 key={`${dest.slug}:${dest.cacheKey}`}
-                src={toImageProxyUrl(dest.image, dest.cacheKey)}
+                src={destinationSrc}
                 alt={dest.name}
                 fill
+                unoptimized={isProxyImageUrl(destinationSrc)}
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 sizes="(max-width: 640px) 100vw, 25vw"
               />
@@ -168,7 +172,8 @@ function DestinationsSection({
               </div>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
