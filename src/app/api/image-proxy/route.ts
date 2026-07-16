@@ -63,17 +63,6 @@ export async function GET(request: NextRequest) {
 
     const arrayBuffer = await response.arrayBuffer();
 
-    // Use the encoded source URL as the ETag so browsers revalidate properly
-    // when the URL changes (i.e., when admin swaps the image in Supabase).
-    // max-age=0 with must-revalidate = browser always checks freshness
-    // but serves from cache if ETag matches (fast for unchanged images).
-    const etag = `"${Buffer.from(input).toString('base64').slice(0, 32)}"`;
-
-    const ifNoneMatch = request.headers.get('if-none-match');
-    if (ifNoneMatch === etag) {
-      return new NextResponse(null, { status: 304 });
-    }
-
     return new NextResponse(arrayBuffer, {
       status: 200,
       headers: {
@@ -81,7 +70,6 @@ export async function GET(request: NextRequest) {
         // short max-age so updates appear within 60 seconds,
         // stale-while-revalidate lets the browser serve old while fetching new
         'Cache-Control': 'public, max-age=60, stale-while-revalidate=300, stale-if-error=600',
-        'ETag': etag,
         'Vary': 'Accept',
       },
     });
