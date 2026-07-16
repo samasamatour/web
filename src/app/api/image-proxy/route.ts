@@ -15,7 +15,7 @@ const ALLOWED_HOSTS = new Set([
 function buildFetchUrl(sourceUrl: string): string {
   const driveId = extractGoogleDriveFileId(sourceUrl);
   if (driveId) {
-    return `https://drive.google.com/uc?export=download&id=${driveId}`;
+    return `https://drive.google.com/thumbnail?id=${driveId}&sz=w2000`;
   }
 
   return sourceUrl;
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=3600',
       },
     });
   } catch {

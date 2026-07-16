@@ -1,4 +1,3 @@
-import { cache } from 'react';
 import { createPublicClient } from '@/lib/supabase/public-server';
 import { Locale } from '@/lib/i18n';
 
@@ -135,7 +134,7 @@ function asJsonObject(value: unknown): Record<string, unknown> {
   return {};
 }
 
-export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
+export async function getSiteSettings(): Promise<SiteSettings> {
   const supabase = createPublicClient();
   const { data } = await supabase
     .from('site_settings')
@@ -160,9 +159,9 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
     global_seo_description_id: data?.global_seo_description_id || null,
     global_seo_description_en: data?.global_seo_description_en || null,
   };
-});
+}
 
-export const getPageByKey = cache(async (locale: Locale, pageKey: string): Promise<LocalizedPage | null> => {
+export async function getPageByKey(locale: Locale, pageKey: string): Promise<LocalizedPage | null> {
   const supabase = createPublicClient();
 
   const { data: page } = await supabase
@@ -242,7 +241,7 @@ export const getPageByKey = cache(async (locale: Locale, pageKey: string): Promi
       content: sectionContentById.get(section.id) || {},
     })),
   };
-});
+}
 
 async function getPackageTranslations(
   supabase: PublicSupabaseClient,
@@ -327,7 +326,7 @@ async function getMediaAltMap(
   return map;
 }
 
-export const getPublishedPackages = cache(async (locale: Locale): Promise<PackageListItem[]> => {
+export async function getPublishedPackages(locale: Locale): Promise<PackageListItem[]> {
   const supabase = createPublicClient();
   const { data: packages } = await supabase
     .from('packages')
@@ -377,9 +376,9 @@ export const getPublishedPackages = cache(async (locale: Locale): Promise<Packag
       } satisfies PackageListItem;
     })
     .filter((item): item is PackageListItem => item !== null);
-});
+}
 
-const getPackageBySlug = cache(async (locale: Locale, slug: string): Promise<any | null> => {
+async function getPackageBySlug(locale: Locale, slug: string): Promise<any | null> {
   const supabase = createPublicClient();
 
   const { data: i18n } = await supabase
@@ -416,12 +415,12 @@ const getPackageBySlug = cache(async (locale: Locale, slug: string): Promise<any
     .maybeSingle();
 
   return pkg || null;
-});
+}
 
-export const getPackageDetail = cache(async (
+export async function getPackageDetail(
   locale: Locale,
   slug: string
-): Promise<PackageDetail | null> => {
+): Promise<PackageDetail | null> {
   const pkg = await getPackageBySlug(locale, slug);
   if (!pkg) {
     return null;
@@ -625,9 +624,9 @@ export const getPackageDetail = cache(async (
     })),
     carRentals,
   };
-});
+}
 
-export const getBlogPosts = cache(async (locale: Locale): Promise<BlogListItem[]> => {
+export async function getBlogPosts(locale: Locale): Promise<BlogListItem[]> {
   const supabase = createPublicClient();
 
   const { data: posts } = await supabase
@@ -682,12 +681,12 @@ export const getBlogPosts = cache(async (locale: Locale): Promise<BlogListItem[]
       };
     })
     .filter((item): item is BlogListItem => item !== null);
-});
+}
 
-export const getBlogPostBySlug = cache(async (
+export async function getBlogPostBySlug(
   locale: Locale,
   slug: string
-): Promise<BlogDetail | null> => {
+): Promise<BlogDetail | null> {
   const supabase = createPublicClient();
 
   const { data: match } = await supabase
@@ -757,9 +756,9 @@ export const getBlogPostBySlug = cache(async (
     robots: i18n.robots || 'index,follow',
     canonicalPath: i18n.canonical_path,
   };
-});
+}
 
-export const getMenuItems = cache(async (locale: Locale, code: string): Promise<MenuItem[]> => {
+export async function getMenuItems(locale: Locale, code: string): Promise<MenuItem[]> {
   const supabase = createPublicClient();
 
   const { data: menu } = await supabase
@@ -822,7 +821,7 @@ export const getMenuItems = cache(async (locale: Locale, code: string): Promise<
       position: item.position,
     };
   });
-});
+}
 
 export async function getRedirectTarget(pathname: string): Promise<{
   toPath: string;
