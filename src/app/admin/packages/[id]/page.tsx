@@ -15,6 +15,21 @@ function parseJsonArray(value: string): any[] {
   }
 }
 
+function revalidatePackagePublicPaths(slugId?: string, slugEn?: string) {
+  revalidatePath('/id/packages');
+  revalidatePath('/en/packages');
+  revalidatePath('/id/packages/[slug]', 'page');
+  revalidatePath('/en/packages/[slug]', 'page');
+
+  if (slugId) {
+    revalidatePath(`/id/packages/${slugId}`);
+  }
+
+  if (slugEn) {
+    revalidatePath(`/en/packages/${slugEn}`);
+  }
+}
+
 async function upsertMediaBySourceUrl(sourceUrl: string) {
   const supabase = await createClient();
 
@@ -52,6 +67,8 @@ async function updatePackageAction(formData: FormData) {
 
   const code = String(formData.get('code') || '').trim();
   const mediaSourceUrl = String(formData.get('media_source_url') || '').trim();
+  const slugId = String(formData.get('slug_id') || '').trim();
+  const slugEn = String(formData.get('slug_en') || '').trim();
   const heroMediaId = await upsertMediaBySourceUrl(mediaSourceUrl);
 
   await supabase
@@ -224,8 +241,7 @@ async function updatePackageAction(formData: FormData) {
 
   revalidatePath(`/admin/packages/${packageId}`);
   revalidatePath('/admin/packages');
-  revalidatePath('/id/packages');
-  revalidatePath('/en/packages');
+  revalidatePackagePublicPaths(slugId, slugEn);
 
   redirect(withAdminNotice(`/admin/packages/${packageId}`, 'success', 'Paket berhasil disimpan.'));
 }
@@ -241,8 +257,7 @@ async function deletePackageAction(formData: FormData) {
 
   await supabase.from('packages').delete().eq('id', packageId);
   revalidatePath('/admin/packages');
-  revalidatePath('/id/packages');
-  revalidatePath('/en/packages');
+  revalidatePackagePublicPaths();
   redirect(withAdminNotice('/admin/packages', 'deleted', 'Paket berhasil dihapus.'));
 }
 
@@ -268,68 +283,46 @@ export default async function AdminPackageDetailPage({
     notFound();
   }
 
-  const [i18nRowsRes, mediaRes, daysRes, dayI18nRes, itemsRes, itemI18nRes, costsRes, carMapRes, allCarsRes] =
-    await Promise.all([
-      supabase.from('package_i18n').select('*').eq('package_id', pkg.id),
-      pkg.hero_media_id
-        ? supabase.from('media_assets').select('source_url').eq('id', pkg.hero_media_id).maybeSingle()
-        : Promise.resolve({ data: null } as any),
-      supabase
-        .from('package_itinerary_days')
-        .select('id, day_number')
-        .eq('package_id', pkg.id)
-        .order('day_number', { ascending: true }),
-      supabase.from('package_itinerary_day_i18n').select('*').in(
-        'day_id',
-        (
-          await supabase
-            .from('package_itinerary_days')
-            .select('id')
-            .eq('package_id', pkg.id)
-        ).data?.map((row) => row.id) || []
-      ),
-      supabase.from('package_itinerary_items').select('*').in(
-        'day_id',
-        (
-          await supabase
-            .from('package_itinerary_days')
-            .select('id')
-            .eq('package_id', pkg.id)
-        ).data?.map((row) => row.id) || []
-      ),
-      supabase.from('package_itinerary_item_i18n').select('*').in(
-        'item_id',
-        (
-          await supabase
-            .from('package_itinerary_items')
-            .select('id')
-            .in(
-              'day_id',
-              (
-                await supabase
-                  .from('package_itinerary_days')
-                  .select('id')
-                  .eq('package_id', pkg.id)
-              ).data?.map((row) => row.id) || []
-            )
-        ).data?.map((row) => row.id) || []
-      ),
-      supabase
-        .from('package_cost_items')
-        .select('*')
-        .eq('package_id', pkg.id)
-        .order('day_number', { ascending: true, nullsFirst: true })
-        .order('position', { ascending: true }),
-      supabase
-        .from('package_car_rentals')
-        .select('car_rental_id, position')
-        .eq('package_id', pkg.id)
-        .order('position', { ascending: true }),
-      supabase
-        .from('car_rentals')
-        .select('id, code, price_idr')
-        .order('code', { ascending: true }),
-    ]);
+  const [i18nRowsRes, mediaRes, daysRes, costsRes, carMapRes, allCarsRes] = await Promise.all([
+    supabase.from('package_i18n').select('*').eq('package_id', pkg.id),
+    pkg.hero_media_id
+      ? supabase.from('media_assets').select('source_url').eq('id', pkg.hero_media_id).maybeSingle()
+      : Promise.resolve({ data: null } as any),
+    supabase
+      .from('package_itinerary_days')
+      .select('id, day_number')
+      .eq('package_id', pkg.id)
+      .order('day_number', { ascending: true }),
+    supabase
+      .from('package_cost_items')
+      .select('*')
+      .eq('package_id', pkg.id)
+      .order('day_number', { ascending: true, nullsFirst: true })
+      .order('position', { ascending: true }),
+    supabase
+      .from('package_car_rentals')
+      .select('car_rental_id, position')
+      .eq('package_id', pkg.id)
+      .order('position', { ascending: true }),
+    supabase
+      .from('car_rentals')
+      .select('id, code, price_idr')
+      .order('code', { ascending: true }),
+  ]);
+
+  const dayIds = (daysRes.data || []).map((row) => row.id);
+
+  const [dayI18nRes, itemsRes] = dayIds.length
+    ? await Promise.all([
+        supabase.from('package_itinerary_day_i18n').select('*').in('day_id', dayIds),
+        supabase.from('package_itinerary_items').select('*').in('day_id', dayIds),
+      ])
+    : [{ data: [] as any[] }, { data: [] as any[] }];
+
+  const itemIds = (itemsRes.data || []).map((item) => item.id);
+  const itemI18nRes = itemIds.length
+    ? await supabase.from('package_itinerary_item_i18n').select('*').in('item_id', itemIds)
+    : { data: [] as any[] };
 
   const i18nRows = i18nRowsRes.data || [];
   const byLocale = new Map(i18nRows.map((row) => [row.locale, row]));

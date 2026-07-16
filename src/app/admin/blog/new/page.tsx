@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { withAdminNotice } from '@/lib/admin/notice';
 
@@ -35,6 +36,20 @@ async function createPostAction(formData: FormData) {
       robots: String(formData.get(`robots_${locale}`) || 'index,follow'),
       canonical_path: String(formData.get(`canonical_path_${locale}`) || ''),
     });
+  }
+
+  const slugId = String(formData.get('slug_id') || '').trim();
+  const slugEn = String(formData.get('slug_en') || '').trim();
+
+  revalidatePath('/id/blog');
+  revalidatePath('/en/blog');
+  revalidatePath('/id/blog/[slug]', 'page');
+  revalidatePath('/en/blog/[slug]', 'page');
+  if (slugId) {
+    revalidatePath(`/id/blog/${slugId}`);
+  }
+  if (slugEn) {
+    revalidatePath(`/en/blog/${slugEn}`);
   }
 
   redirect(withAdminNotice(`/admin/blog/${post.id}`, 'created', 'Artikel baru berhasil dibuat.'));

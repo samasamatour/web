@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 import { requireAdminUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { AdminNoticeToaster } from '@/components/admin/AdminNoticeToaster';
+import { AdminActionProgress } from '@/components/admin/AdminActionProgress';
 
 export const metadata: Metadata = {
   robots: {
@@ -49,6 +50,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNoticeToaster />
+      <AdminActionProgress />
       <header className="border-b bg-white">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-6">
           <div>

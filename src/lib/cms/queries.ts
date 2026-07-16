@@ -548,7 +548,7 @@ export const getPackageDetail = cache(async (
     }
   }
 
-  const carMap = new Map((carRows || []).map((row) => [row.id, row]));
+  const carMap = new Map<string, any>((carRows || []).map((row: any) => [row.id, row]));
 
   const itinerary = (days || []).map((day) => {
     const dayItems = (items || [])

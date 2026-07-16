@@ -3,6 +3,33 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { withAdminNotice } from '@/lib/admin/notice';
 
+async function resolveMediaIdBySourceUrl(sourceUrl: string): Promise<string | null> {
+  const supabase = await createClient();
+  const cleanUrl = sourceUrl.trim();
+
+  if (!cleanUrl) {
+    return null;
+  }
+
+  const { data: existingMedia } = await supabase
+    .from('media_assets')
+    .select('id')
+    .eq('source_url', cleanUrl)
+    .maybeSingle();
+
+  if (existingMedia?.id) {
+    return existingMedia.id;
+  }
+
+  const { data: insertedMedia } = await supabase
+    .from('media_assets')
+    .insert({ source_type: 'external', source_url: cleanUrl, is_active: true })
+    .select('id')
+    .single();
+
+  return insertedMedia?.id || null;
+}
+
 async function createCarRentalAction(formData: FormData) {
   'use server';
   const supabase = await createClient();
@@ -13,26 +40,7 @@ async function createCarRentalAction(formData: FormData) {
   }
 
   const mediaSourceUrl = String(formData.get('media_source_url') || '').trim();
-  let imageMediaId: string | null = null;
-
-  if (mediaSourceUrl) {
-    const { data: existingMedia } = await supabase
-      .from('media_assets')
-      .select('id')
-      .eq('source_url', mediaSourceUrl)
-      .maybeSingle();
-
-    if (existingMedia?.id) {
-      imageMediaId = existingMedia.id;
-    } else {
-      const { data: insertedMedia } = await supabase
-        .from('media_assets')
-        .insert({ source_type: 'external', source_url: mediaSourceUrl, is_active: true })
-        .select('id')
-        .single();
-      imageMediaId = insertedMedia?.id || null;
-    }
-  }
+  const imageMediaId = await resolveMediaIdBySourceUrl(mediaSourceUrl);
 
   const { data: car } = await supabase
     .from('car_rentals')
@@ -68,6 +76,8 @@ async function createCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+  revalidatePath('/id/packages/[slug]', 'page');
+  revalidatePath('/en/packages/[slug]', 'page');
 
   redirect(withAdminNotice('/admin/car-rentals', 'created', 'Car rental berhasil ditambahkan.'));
 }
@@ -81,6 +91,9 @@ async function updateCarRentalAction(formData: FormData) {
     redirect(withAdminNotice('/admin/car-rentals', 'error', 'ID car rental tidak ditemukan.'));
   }
 
+  const mediaSourceUrl = String(formData.get('media_source_url') || '').trim();
+  const imageMediaId = await resolveMediaIdBySourceUrl(mediaSourceUrl);
+
   await supabase
     .from('car_rentals')
     .update({
@@ -90,6 +103,7 @@ async function updateCarRentalAction(formData: FormData) {
       transmission: String(formData.get('transmission') || ''),
       has_ac: String(formData.get('has_ac') || 'off') === 'on',
       luggage_capacity: Number(formData.get('luggage_capacity') || 0) || null,
+      image_media_id: imageMediaId,
     })
     .eq('id', id);
 
@@ -110,6 +124,8 @@ async function updateCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+  revalidatePath('/id/packages/[slug]', 'page');
+  revalidatePath('/en/packages/[slug]', 'page');
 
   redirect(withAdminNotice('/admin/car-rentals', 'success', 'Car rental berhasil disimpan.'));
 }
@@ -127,6 +143,8 @@ async function deleteCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+  revalidatePath('/id/packages/[slug]', 'page');
+  revalidatePath('/en/packages/[slug]', 'page');
 
   redirect(withAdminNotice('/admin/car-rentals', 'deleted', 'Car rental berhasil dihapus.'));
 }
@@ -210,6 +228,12 @@ export default async function AdminCarRentalsPage() {
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" name="has_ac" defaultChecked={car.has_ac} className="h-4 w-4" /> Has AC
                 </label>
+                <input
+                  name="media_source_url"
+                  defaultValue={car.image_media_id ? mediaMap.get(car.image_media_id) || '' : ''}
+                  className="rounded-md border px-3 py-2 text-sm md:col-span-2"
+                  placeholder="image source url"
+                />
                 <input name="slug_id" defaultValue={local.id?.slug || ''} className="rounded-md border px-3 py-2 text-sm" placeholder="slug id" />
                 <input name="slug_en" defaultValue={local.en?.slug || ''} className="rounded-md border px-3 py-2 text-sm" placeholder="slug en" />
                 <input name="name_id" defaultValue={local.id?.name || ''} className="rounded-md border px-3 py-2 text-sm" placeholder="name id" />

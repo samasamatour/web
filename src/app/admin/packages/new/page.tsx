@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { withAdminNotice } from '@/lib/admin/notice';
 
@@ -47,6 +48,20 @@ async function createPackageAction(formData: FormData) {
       seo_title: String(formData.get(`seo_title_${locale}`) || '').trim(),
       seo_description: String(formData.get(`seo_description_${locale}`) || '').trim(),
     });
+  }
+
+  const slugId = String(formData.get('slug_id') || '').trim();
+  const slugEn = String(formData.get('slug_en') || '').trim();
+
+  revalidatePath('/id/packages');
+  revalidatePath('/en/packages');
+  revalidatePath('/id/packages/[slug]', 'page');
+  revalidatePath('/en/packages/[slug]', 'page');
+  if (slugId) {
+    revalidatePath(`/id/packages/${slugId}`);
+  }
+  if (slugEn) {
+    revalidatePath(`/en/packages/${slugEn}`);
   }
 
   redirect(withAdminNotice(`/admin/packages/${pkg.id}`, 'created', 'Paket baru berhasil dibuat.'));

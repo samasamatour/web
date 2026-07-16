@@ -23,8 +23,19 @@ export function extractGoogleDriveFileId(url: string): string | null {
   return null;
 }
 
+const DIRECT_IMAGE_HOSTS = new Set(['images.unsplash.com']);
+
 export function toImageProxyUrl(sourceUrl: string | null | undefined): string {
   if (!sourceUrl) {
+    return '/placeholder.svg';
+  }
+
+  try {
+    const parsedUrl = new URL(sourceUrl);
+    if (DIRECT_IMAGE_HOSTS.has(parsedUrl.hostname)) {
+      return sourceUrl;
+    }
+  } catch {
     return '/placeholder.svg';
   }
 

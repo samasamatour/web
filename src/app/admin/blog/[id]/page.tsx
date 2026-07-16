@@ -36,6 +36,8 @@ async function updatePostAction(formData: FormData) {
 
   const status = String(formData.get('status') || 'draft');
   const coverSourceUrl = String(formData.get('cover_source_url') || '');
+  const slugId = String(formData.get('slug_id') || '').trim();
+  const slugEn = String(formData.get('slug_en') || '').trim();
   const coverMediaId = await upsertMedia(coverSourceUrl);
 
   await supabase
@@ -69,6 +71,14 @@ async function updatePostAction(formData: FormData) {
   revalidatePath('/admin/blog');
   revalidatePath('/id/blog');
   revalidatePath('/en/blog');
+  revalidatePath('/id/blog/[slug]', 'page');
+  revalidatePath('/en/blog/[slug]', 'page');
+  if (slugId) {
+    revalidatePath(`/id/blog/${slugId}`);
+  }
+  if (slugEn) {
+    revalidatePath(`/en/blog/${slugEn}`);
+  }
 
   redirect(withAdminNotice(`/admin/blog/${postId}`, 'success', 'Artikel berhasil disimpan.'));
 }

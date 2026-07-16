@@ -6,6 +6,8 @@ export const revalidate = 3600;
 
 const ALLOWED_HOSTS = new Set([
   'drive.google.com',
+  'docs.google.com',
+  'drive.usercontent.google.com',
   'lh3.googleusercontent.com',
   'images.unsplash.com',
 ]);
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
   } catch {
