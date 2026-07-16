@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function upsertMedia(sourceUrl: string): Promise<string | null> {
   const supabase = await createClient();
@@ -30,7 +31,7 @@ async function updatePostAction(formData: FormData) {
 
   const postId = String(formData.get('post_id') || '');
   if (!postId) {
-    return;
+    redirect(withAdminNotice('/admin/blog', 'error', 'ID artikel tidak ditemukan.'));
   }
 
   const status = String(formData.get('status') || 'draft');
@@ -68,6 +69,8 @@ async function updatePostAction(formData: FormData) {
   revalidatePath('/admin/blog');
   revalidatePath('/id/blog');
   revalidatePath('/en/blog');
+
+  redirect(withAdminNotice(`/admin/blog/${postId}`, 'success', 'Artikel berhasil disimpan.'));
 }
 
 async function deletePostAction(formData: FormData) {
@@ -75,7 +78,7 @@ async function deletePostAction(formData: FormData) {
   const supabase = await createClient();
   const postId = String(formData.get('post_id') || '');
   if (!postId) {
-    return;
+    redirect(withAdminNotice('/admin/blog', 'error', 'ID artikel tidak ditemukan.'));
   }
 
   await supabase.from('blog_posts').delete().eq('id', postId);
@@ -83,7 +86,7 @@ async function deletePostAction(formData: FormData) {
   revalidatePath('/admin/blog');
   revalidatePath('/id/blog');
   revalidatePath('/en/blog');
-  redirect('/admin/blog');
+  redirect(withAdminNotice('/admin/blog', 'deleted', 'Artikel berhasil dihapus.'));
 }
 
 export default async function AdminBlogPostDetailPage({

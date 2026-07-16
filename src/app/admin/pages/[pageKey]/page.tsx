@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function updatePageMetadataAction(formData: FormData) {
   'use server';
@@ -30,6 +31,8 @@ async function updatePageMetadataAction(formData: FormData) {
 
   revalidatePath(`/admin/pages/${pageKey}`);
   revalidatePath('/admin/pages');
+
+  redirect(withAdminNotice(`/admin/pages/${pageKey}`, 'success', 'Metadata halaman berhasil disimpan.'));
 }
 
 async function upsertSectionAction(formData: FormData) {
@@ -109,6 +112,8 @@ async function upsertSectionAction(formData: FormData) {
   revalidatePath('/admin/pages');
   revalidatePath('/id');
   revalidatePath('/en');
+
+  redirect(withAdminNotice(`/admin/pages/${pageKey}`, 'success', 'Section berhasil disimpan.'));
 }
 
 async function deleteSectionAction(formData: FormData) {
@@ -125,6 +130,8 @@ async function deleteSectionAction(formData: FormData) {
   revalidatePath('/admin/pages');
   revalidatePath('/id');
   revalidatePath('/en');
+
+  redirect(withAdminNotice(`/admin/pages/${pageKey}`, 'deleted', 'Section berhasil dihapus.'));
 }
 
 export default async function AdminPageDetail({

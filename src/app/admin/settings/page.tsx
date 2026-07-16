@@ -1,5 +1,7 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function updateSettingsAction(formData: FormData) {
   'use server';
@@ -26,6 +28,8 @@ async function updateSettingsAction(formData: FormData) {
   revalidatePath('/admin/settings');
   revalidatePath('/en');
   revalidatePath('/id');
+
+  redirect(withAdminNotice('/admin/settings', 'success', 'Settings berhasil disimpan.'));
 }
 
 export default async function AdminSettingsPage() {

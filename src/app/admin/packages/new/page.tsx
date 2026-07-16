@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function createPackageAction(formData: FormData) {
   'use server';
@@ -9,7 +10,7 @@ async function createPackageAction(formData: FormData) {
   const priceIdr = Number(formData.get('price_idr') || 0);
 
   if (!code || priceIdr <= 0) {
-    return;
+    redirect(withAdminNotice('/admin/packages/new', 'error', 'Kode paket dan harga wajib diisi.'));
   }
 
   const { data: pkg } = await supabase
@@ -29,7 +30,7 @@ async function createPackageAction(formData: FormData) {
     .single();
 
   if (!pkg?.id) {
-    return;
+    redirect(withAdminNotice('/admin/packages/new', 'error', 'Gagal membuat paket baru.'));
   }
 
   for (const locale of ['id', 'en'] as const) {
@@ -48,7 +49,7 @@ async function createPackageAction(formData: FormData) {
     });
   }
 
-  redirect(`/admin/packages/${pkg.id}`);
+  redirect(withAdminNotice(`/admin/packages/${pkg.id}`, 'created', 'Paket baru berhasil dibuat.'));
 }
 
 export default function AdminCreatePackagePage() {

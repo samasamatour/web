@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 function parseJsonArray(value: string): any[] {
   try {
@@ -225,6 +226,8 @@ async function updatePackageAction(formData: FormData) {
   revalidatePath('/admin/packages');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+
+  redirect(withAdminNotice(`/admin/packages/${packageId}`, 'success', 'Paket berhasil disimpan.'));
 }
 
 async function deletePackageAction(formData: FormData) {
@@ -240,7 +243,7 @@ async function deletePackageAction(formData: FormData) {
   revalidatePath('/admin/packages');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
-  redirect('/admin/packages');
+  redirect(withAdminNotice('/admin/packages', 'deleted', 'Paket berhasil dihapus.'));
 }
 
 function prettyJson(value: unknown): string {

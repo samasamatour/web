@@ -1,5 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { createPublicClient } from '@/lib/supabase/public-server';
 import { Locale } from '@/lib/i18n';
+
+type PublicSupabaseClient = ReturnType<typeof createPublicClient>;
 
 export type SiteSettings = {
   organization_name: string;
@@ -132,8 +135,8 @@ function asJsonObject(value: unknown): Record<string, unknown> {
   return {};
 }
 
-export async function getSiteSettings(): Promise<SiteSettings> {
-  const supabase = await createClient();
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from('site_settings')
     .select(
@@ -157,10 +160,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     global_seo_description_id: data?.global_seo_description_id || null,
     global_seo_description_en: data?.global_seo_description_en || null,
   };
-}
+});
 
-export async function getPageByKey(locale: Locale, pageKey: string): Promise<LocalizedPage | null> {
-  const supabase = await createClient();
+export const getPageByKey = cache(async (locale: Locale, pageKey: string): Promise<LocalizedPage | null> => {
+  const supabase = createPublicClient();
 
   const { data: page } = await supabase
     .from('cms_pages')
@@ -239,17 +242,16 @@ export async function getPageByKey(locale: Locale, pageKey: string): Promise<Loc
       content: sectionContentById.get(section.id) || {},
     })),
   };
-}
+});
 
 async function getPackageTranslations(
+  supabase: PublicSupabaseClient,
   packageIds: string[],
   locale: Locale
 ): Promise<Map<string, any>> {
   if (!packageIds.length) {
     return new Map();
   }
-
-  const supabase = await createClient();
 
   const { data: rows } = await supabase
     .from('package_i18n')
@@ -276,12 +278,14 @@ async function getPackageTranslations(
   return translations;
 }
 
-async function getMediaMap(mediaIds: string[]): Promise<Map<string, any>> {
+async function getMediaMap(
+  supabase: PublicSupabaseClient,
+  mediaIds: string[]
+): Promise<Map<string, any>> {
   if (!mediaIds.length) {
     return new Map();
   }
 
-  const supabase = await createClient();
   const { data } = await supabase
     .from('media_assets')
     .select('id, source_url')
@@ -291,12 +295,15 @@ async function getMediaMap(mediaIds: string[]): Promise<Map<string, any>> {
   return new Map((data || []).map((row) => [row.id, row]));
 }
 
-async function getMediaAltMap(mediaIds: string[], locale: Locale): Promise<Map<string, string>> {
+async function getMediaAltMap(
+  supabase: PublicSupabaseClient,
+  mediaIds: string[],
+  locale: Locale
+): Promise<Map<string, string>> {
   if (!mediaIds.length) {
     return new Map();
   }
 
-  const supabase = await createClient();
   const { data } = await supabase
     .from('media_asset_i18n')
     .select('media_id, locale, alt_text')
@@ -320,8 +327,8 @@ async function getMediaAltMap(mediaIds: string[], locale: Locale): Promise<Map<s
   return map;
 }
 
-export async function getPublishedPackages(locale: Locale): Promise<PackageListItem[]> {
-  const supabase = await createClient();
+export const getPublishedPackages = cache(async (locale: Locale): Promise<PackageListItem[]> => {
+  const supabase = createPublicClient();
   const { data: packages } = await supabase
     .from('packages')
     .select(
@@ -337,9 +344,9 @@ export async function getPublishedPackages(locale: Locale): Promise<PackageListI
     .filter((value): value is string => !!value);
 
   const [translations, mediaMap, mediaAltMap] = await Promise.all([
-    getPackageTranslations(packageIds, locale),
-    getMediaMap(mediaIds),
-    getMediaAltMap(mediaIds, locale),
+    getPackageTranslations(supabase, packageIds, locale),
+    getMediaMap(supabase, mediaIds),
+    getMediaAltMap(supabase, mediaIds, locale),
   ]);
 
   return (packages || [])
@@ -370,10 +377,10 @@ export async function getPublishedPackages(locale: Locale): Promise<PackageListI
       } satisfies PackageListItem;
     })
     .filter((item): item is PackageListItem => item !== null);
-}
+});
 
-async function getPackageBySlug(locale: Locale, slug: string): Promise<any | null> {
-  const supabase = await createClient();
+const getPackageBySlug = cache(async (locale: Locale, slug: string): Promise<any | null> => {
+  const supabase = createPublicClient();
 
   const { data: i18n } = await supabase
     .from('package_i18n')
@@ -409,23 +416,23 @@ async function getPackageBySlug(locale: Locale, slug: string): Promise<any | nul
     .maybeSingle();
 
   return pkg || null;
-}
+});
 
-export async function getPackageDetail(
+export const getPackageDetail = cache(async (
   locale: Locale,
   slug: string
-): Promise<PackageDetail | null> {
+): Promise<PackageDetail | null> => {
   const pkg = await getPackageBySlug(locale, slug);
   if (!pkg) {
     return null;
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const [translations, mediaMap, mediaAltMap] = await Promise.all([
-    getPackageTranslations([pkg.id], locale),
-    getMediaMap(pkg.hero_media_id ? [pkg.hero_media_id] : []),
-    getMediaAltMap(pkg.hero_media_id ? [pkg.hero_media_id] : [], locale),
+    getPackageTranslations(supabase, [pkg.id], locale),
+    getMediaMap(supabase, pkg.hero_media_id ? [pkg.hero_media_id] : []),
+    getMediaAltMap(supabase, pkg.hero_media_id ? [pkg.hero_media_id] : [], locale),
   ]);
 
   const i18n = translations.get(pkg.id);
@@ -527,7 +534,7 @@ export async function getPackageDetail(
   const carMediaIds = (carRows || [])
     .map((row) => row.image_media_id)
     .filter((value): value is string => !!value);
-  const carMediaMap = await getMediaMap(carMediaIds);
+  const carMediaMap = await getMediaMap(supabase, carMediaIds);
 
   const carI18nMap = new Map<string, any>();
   for (const row of carI18nRows || []) {
@@ -618,10 +625,10 @@ export async function getPackageDetail(
     })),
     carRentals,
   };
-}
+});
 
-export async function getBlogPosts(locale: Locale): Promise<BlogListItem[]> {
-  const supabase = await createClient();
+export const getBlogPosts = cache(async (locale: Locale): Promise<BlogListItem[]> => {
+  const supabase = createPublicClient();
 
   const { data: posts } = await supabase
     .from('blog_posts')
@@ -654,7 +661,7 @@ export async function getBlogPosts(locale: Locale): Promise<BlogListItem[]> {
   const coverIds = (posts || [])
     .map((post) => post.cover_media_id)
     .filter((value): value is string => !!value);
-  const mediaMap = await getMediaMap(coverIds);
+  const mediaMap = await getMediaMap(supabase, coverIds);
 
   return (posts || [])
     .map((post) => {
@@ -675,13 +682,13 @@ export async function getBlogPosts(locale: Locale): Promise<BlogListItem[]> {
       };
     })
     .filter((item): item is BlogListItem => item !== null);
-}
+});
 
-export async function getBlogPostBySlug(
+export const getBlogPostBySlug = cache(async (
   locale: Locale,
   slug: string
-): Promise<BlogDetail | null> {
-  const supabase = await createClient();
+): Promise<BlogDetail | null> => {
+  const supabase = createPublicClient();
 
   const { data: match } = await supabase
     .from('blog_post_i18n')
@@ -735,7 +742,7 @@ export async function getBlogPostBySlug(
     return null;
   }
 
-  const mediaMap = await getMediaMap(post.cover_media_id ? [post.cover_media_id] : []);
+  const mediaMap = await getMediaMap(supabase, post.cover_media_id ? [post.cover_media_id] : []);
 
   return {
     id: post.id,
@@ -750,10 +757,10 @@ export async function getBlogPostBySlug(
     robots: i18n.robots || 'index,follow',
     canonicalPath: i18n.canonical_path,
   };
-}
+});
 
-export async function getMenuItems(locale: Locale, code: string): Promise<MenuItem[]> {
-  const supabase = await createClient();
+export const getMenuItems = cache(async (locale: Locale, code: string): Promise<MenuItem[]> => {
+  const supabase = createPublicClient();
 
   const { data: menu } = await supabase
     .from('menus')
@@ -815,13 +822,13 @@ export async function getMenuItems(locale: Locale, code: string): Promise<MenuIt
       position: item.position,
     };
   });
-}
+});
 
 export async function getRedirectTarget(pathname: string): Promise<{
   toPath: string;
   statusCode: number;
 } | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from('redirects')
     .select('to_path, status_code')

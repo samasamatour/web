@@ -1,9 +1,18 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { requireAdminUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { AdminNoticeToaster } from '@/components/admin/AdminNoticeToaster';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 async function signOutAction() {
   'use server';
@@ -39,6 +48,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNoticeToaster />
       <header className="border-b bg-white">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-6">
           <div>

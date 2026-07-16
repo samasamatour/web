@@ -1,5 +1,7 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 type RedirectItem = {
   from_path: string;
@@ -38,6 +40,8 @@ async function saveRedirectsAction(formData: FormData) {
   }
 
   revalidatePath('/admin/redirects');
+
+  redirect(withAdminNotice('/admin/redirects', 'success', 'Redirect rules berhasil disimpan.'));
 }
 
 export default async function AdminRedirectsPage() {

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function createPostAction(formData: FormData) {
   'use server';
@@ -18,7 +19,7 @@ async function createPostAction(formData: FormData) {
     .single();
 
   if (!post?.id) {
-    return;
+    redirect(withAdminNotice('/admin/blog/new', 'error', 'Gagal membuat artikel baru.'));
   }
 
   for (const locale of ['id', 'en'] as const) {
@@ -36,7 +37,7 @@ async function createPostAction(formData: FormData) {
     });
   }
 
-  redirect(`/admin/blog/${post.id}`);
+  redirect(withAdminNotice(`/admin/blog/${post.id}`, 'created', 'Artikel baru berhasil dibuat.'));
 }
 
 export default function AdminCreateBlogPostPage() {

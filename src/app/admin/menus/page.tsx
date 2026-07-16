@@ -1,5 +1,7 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 type MenuJsonItem = {
   kind: 'internal' | 'external' | 'cta';
@@ -15,7 +17,7 @@ async function saveMenuAction(formData: FormData) {
   const supabase = await createClient();
   const menuId = String(formData.get('menu_id') || '');
   if (!menuId) {
-    return;
+    redirect(withAdminNotice('/admin/menus', 'error', 'Menu tidak ditemukan.'));
   }
 
   let items: MenuJsonItem[] = [];
@@ -74,6 +76,8 @@ async function saveMenuAction(formData: FormData) {
   revalidatePath('/admin/menus');
   revalidatePath('/id');
   revalidatePath('/en');
+
+  redirect(withAdminNotice('/admin/menus', 'success', 'Menu berhasil disimpan.'));
 }
 
 export default async function AdminMenusPage() {

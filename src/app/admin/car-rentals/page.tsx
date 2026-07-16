@@ -1,5 +1,7 @@
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { withAdminNotice } from '@/lib/admin/notice';
 
 async function createCarRentalAction(formData: FormData) {
   'use server';
@@ -7,7 +9,7 @@ async function createCarRentalAction(formData: FormData) {
 
   const code = String(formData.get('code') || '').trim();
   if (!code) {
-    return;
+    redirect(withAdminNotice('/admin/car-rentals', 'error', 'Kode armada wajib diisi.'));
   }
 
   const mediaSourceUrl = String(formData.get('media_source_url') || '').trim();
@@ -48,7 +50,7 @@ async function createCarRentalAction(formData: FormData) {
     .single();
 
   if (!car?.id) {
-    return;
+    redirect(withAdminNotice('/admin/car-rentals', 'error', 'Gagal menambahkan car rental.'));
   }
 
   for (const locale of ['id', 'en'] as const) {
@@ -66,6 +68,8 @@ async function createCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+
+  redirect(withAdminNotice('/admin/car-rentals', 'created', 'Car rental berhasil ditambahkan.'));
 }
 
 async function updateCarRentalAction(formData: FormData) {
@@ -74,7 +78,7 @@ async function updateCarRentalAction(formData: FormData) {
 
   const id = String(formData.get('car_rental_id') || '');
   if (!id) {
-    return;
+    redirect(withAdminNotice('/admin/car-rentals', 'error', 'ID car rental tidak ditemukan.'));
   }
 
   await supabase
@@ -106,6 +110,8 @@ async function updateCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+
+  redirect(withAdminNotice('/admin/car-rentals', 'success', 'Car rental berhasil disimpan.'));
 }
 
 async function deleteCarRentalAction(formData: FormData) {
@@ -113,7 +119,7 @@ async function deleteCarRentalAction(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get('car_rental_id') || '');
   if (!id) {
-    return;
+    redirect(withAdminNotice('/admin/car-rentals', 'error', 'ID car rental tidak ditemukan.'));
   }
 
   await supabase.from('car_rentals').delete().eq('id', id);
@@ -121,6 +127,8 @@ async function deleteCarRentalAction(formData: FormData) {
   revalidatePath('/admin/car-rentals');
   revalidatePath('/id/packages');
   revalidatePath('/en/packages');
+
+  redirect(withAdminNotice('/admin/car-rentals', 'deleted', 'Car rental berhasil dihapus.'));
 }
 
 export default async function AdminCarRentalsPage() {
