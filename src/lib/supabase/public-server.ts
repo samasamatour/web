@@ -20,6 +20,14 @@ export function createPublicClient(): any {
       persistSession: false,
       detectSessionInUrl: false,
     },
+    global: {
+      fetch: (url, options = {}) => {
+        // Disable Next.js fetch cache to prevent stale/mixed data
+        // between different pages. Page-level caching is still handled
+        // by the `revalidate` export in each page.
+        return fetch(url, { ...options, cache: 'no-store' });
+      },
+    },
   });
 
   return publicClient;

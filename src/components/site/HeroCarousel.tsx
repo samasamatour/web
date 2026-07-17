@@ -63,15 +63,17 @@ export function HeroCarousel({
       {/* ── Background slides ─────────────────────────────── */}
       {slides.map((slide, i) => (
         <div
-          key={slide.imageUrl}
+          key={`slide-${i}-${slide.packageName}`}
           className="absolute inset-0 transition-opacity duration-700 ease-in-out"
           style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
         >
           <Image
+            key={`img-${i}-${slide.imageUrl}`}
             src={slide.imageUrl}
             alt={slide.packageName}
             fill
             priority={i === 0}
+            loading="eager"
             unoptimized={isProxyImageUrl(slide.imageUrl)}
             className="object-cover"
             sizes="100vw"
@@ -81,6 +83,7 @@ export function HeroCarousel({
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
         </div>
       ))}
+
 
       {/* ── Decorative glowing orbs ───────────────────────── */}
       <div className="pointer-events-none absolute -left-24 -top-24 z-10 h-96 w-96 rounded-full bg-brand-primary opacity-10 blur-[100px]" />
