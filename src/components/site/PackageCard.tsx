@@ -104,7 +104,7 @@ export function PackageCard({
           <Link
             href={`https://wa.me/6282236037774?text=${waMessage}`}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="flex items-center justify-center rounded-xl border border-[#25D366] bg-[#25D366]/10 px-3 py-3 text-[#25D366] transition-all hover:bg-[#25D366] hover:text-white"
             title="WhatsApp"
           >

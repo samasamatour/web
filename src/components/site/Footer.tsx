@@ -62,7 +62,7 @@ export function SiteFooter({
             <h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-slate-400">
               {t(locale, 'Navigasi', 'Navigation')}
             </h4>
-            <div className="flex flex-col gap-3">
+            <nav aria-label="Footer navigation" className="flex flex-col gap-3">
               {items.map((item) => (
                 <Link
                   key={item.id}
@@ -72,7 +72,7 @@ export function SiteFooter({
                   {item.label}
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
 
           {/* Contact */}
@@ -84,7 +84,7 @@ export function SiteFooter({
               <a
                 href={`https://wa.me/${waNumber}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="flex items-center gap-3 transition-colors hover:text-[#25D366]"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366]">

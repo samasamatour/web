@@ -59,13 +59,22 @@ export function HeroCarousel({
   if (!slides.length) return null;
 
   return (
-    <section className="relative overflow-hidden rounded-[2.5rem] shadow-2xl" style={{ minHeight: '90vh' }}>
+    <section 
+      className="relative overflow-hidden rounded-[2.5rem] shadow-2xl" 
+      style={{ minHeight: '90vh' }}
+      aria-roledescription="carousel"
+      aria-label="Featured Destinations"
+    >
       {/* ── Background slides ─────────────────────────────── */}
       {slides.map((slide, i) => (
         <div
           key={`slide-${i}-${slide.packageName}`}
           className="absolute inset-0 transition-opacity duration-700 ease-in-out"
           style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
+          role="group"
+          aria-roledescription="slide"
+          aria-hidden={i !== current}
+          aria-live={i === current ? "polite" : "off"}
         >
           <Image
             key={`img-${i}-${slide.imageUrl}`}
@@ -187,13 +196,6 @@ export function HeroCarousel({
         </div>
       </div>
 
-      {/* Inline keyframe for the progress bar */}
-      <style>{`
-        @keyframes progress-bar {
-          from { width: 0%; }
-          to   { width: 100%; }
-        }
-      `}</style>
     </section>
   );
 }

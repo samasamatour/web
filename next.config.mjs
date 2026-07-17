@@ -1,13 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
+  compress: true,
   images: {
-    domains: ['images.unsplash.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         port: '',
         pathname: '/**',
+      },
+    ],
+    localPatterns: [
+      {
+        pathname: '/api/image-proxy/**',
+        search: '?url=*',
       },
     ],
   },
