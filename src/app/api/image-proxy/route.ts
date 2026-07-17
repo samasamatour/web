@@ -43,7 +43,6 @@ export async function GET(request: NextRequest) {
 
   try {
     // Use no-store so the proxy always fetches fresh from origin.
-    // Caching is delegated to the browser/CDN via Cache-Control headers below.
     const response = await fetch(fetchUrl, {
       redirect: 'follow',
       headers: {
@@ -67,13 +66,18 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        // short max-age so updates appear within 60 seconds,
-        // stale-while-revalidate lets the browser serve old while fetching new
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300, stale-if-error=600',
-        'Vary': 'Accept',
+        // Browser can cache for 60s, but CDN must NOT cache
+        // (Netlify/Cloudflare CDN was ignoring query params and returning
+        // the same cached image for all packages)
+        'Cache-Control': 'public, max-age=60, stale-if-error=600',
+        'CDN-Cache-Control': 'no-store',
+        'Cloudflare-CDN-Cache-Control': 'no-store',
+        // Vary on full URL to prevent CDN from collapsing different images
+        'Vary': 'Accept, x-forwarded-host',
       },
     });
   } catch {
     return NextResponse.redirect(new URL('/placeholder.svg', request.url));
   }
 }
+
