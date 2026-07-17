@@ -131,6 +131,7 @@ export default async function PackageDetailPage({
             src={heroImage}
             alt={packageDetail.heroImageAlt || packageDetail.name}
             fill
+            priority={true}
             unoptimized={isProxyImageUrl(heroImage)}
             className="object-cover"
             sizes="100vw"

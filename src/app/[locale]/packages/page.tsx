@@ -67,12 +67,13 @@ export default async function PackagesPage({
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {packages.map((packageItem) => (
+        {packages.map((packageItem, index) => (
           <PackageCard
             key={packageItem.id}
             locale={locale}
             packageItem={packageItem}
             usdToIdr={settings.usd_to_idr}
+            priority={index < 4}
           />
         ))}
       </div>

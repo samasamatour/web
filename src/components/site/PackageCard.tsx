@@ -9,10 +9,12 @@ export function PackageCard({
   locale,
   packageItem,
   usdToIdr,
+  priority = false,
 }: {
   locale: Locale;
   packageItem: PackageListItem;
   usdToIdr: number;
+  priority?: boolean;
 }) {
   const waMessage = encodeURIComponent(
     t(locale,
@@ -31,6 +33,7 @@ export function PackageCard({
           src={heroSrc}
           alt={packageItem.heroImageAlt || packageItem.name}
           fill
+          priority={priority}
           unoptimized={isProxyImageUrl(heroSrc)}
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, 33vw"
