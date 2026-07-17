@@ -16,6 +16,9 @@ const nextConfig = {
         pathname: '/api/image-proxy/**',
         search: '?url=*',
       },
+      {
+        pathname: '/**',
+      },
     ],
   },
 }
